@@ -3,10 +3,7 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,73 +13,119 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void createUsersTable() {
-        String myTableName = "CREATE TABLE IF NOT EXISTS anyTable ("
-                + "id INT NOT NULL AUTO_INCREMENT,"
+        Connection connection = Util.getConnection();
+        String table = "CREATE TABLE IF NOT EXISTS users ("
+                + "id BIGINT NOT NULL AUTO_INCREMENT,"
                 + "name VARCHAR(45) NOT NULL,"
                 + "lastName VARCHAR(45) NOT NULL,"
                 + "age INT(3) NOT NULL, PRIMARY KEY (id))";
-        try (Statement stmt = Util.settingConnection().createStatement()) {
-            stmt.executeUpdate(myTableName);
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(table);
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException throwables) {
+                System.out.println("При попытке роллбэка произошла ошибка");
+                throwables.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
 
     public void dropUsersTable() {
-        try (Statement stmt = Util.settingConnection().createStatement()) {
-            stmt.execute("DROP TABLE IF EXISTS anyTable;");
+        Connection connection = Util.getConnection();
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("DROP TABLE IF EXISTS users;");
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException throwables) {
+                System.out.println("При попытке роллбэка произошла ошибка");
+                throwables.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        String parameter = "INSERT INTO anyTable (name, lastName, age) VALUES(?,?,?)";
-        try (PreparedStatement preStmt = Util.settingConnection().prepareStatement(parameter)) {
+        Connection connection = Util.getConnection();
+        String parameter = "INSERT INTO users (name, lastName, age) VALUES(?,?,?)";
+        try (PreparedStatement preStmt = connection.prepareStatement(parameter)) {
             preStmt.setString(1, name);
             preStmt.setString(2, lastName);
             preStmt.setInt(3, age);
             preStmt.execute();
             System.out.println("User с именем – " + name + " добавлен в базу данных");
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException throwables) {
+                System.out.println("При попытке роллбэка произошла ошибка");
+                throwables.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
 
     public void removeUserById(long id) {
-        String delete = "delete from anyTable where id == id VALUES (?)";
-        try (PreparedStatement preStmt = Util.settingConnection().prepareStatement(delete)) {
+        Connection connection = Util.getConnection();
+        String delete = "delete from users where id == id VALUES (?)";
+        try (PreparedStatement preStmt = connection.prepareStatement(delete)) {
             preStmt.setLong(1, id);
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException throwables) {
+                System.out.println("При попытке роллбэка произошла ошибка");
+                throwables.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
 
     public List<User> getAllUsers() {
+        Connection connection = Util.getConnection();
         List<User> result = new ArrayList<>();
-        String query = "select * from anyTable";
-        try (Statement stmt = Util.settingConnection().createStatement()) {
+        String query = "select * from users";
+        try (Statement stmt = connection.createStatement()) {
             ResultSet set = stmt.executeQuery(query);
             while (set.next()) {
-                int index = 0;
                 User user = new User(set.getString("name"),
                         set.getString("lastName"),
                         set.getByte("age"));
                 user.setId(set.getLong("id"));
                 result.add(user);
-
             }
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException throwables) {
+                System.out.println("При попытке роллбэка произошла ошибка");
+                throwables.printStackTrace();
+            }
             e.printStackTrace();
         }
         return result;
     }
 
     public void cleanUsersTable() {
-        String delete = "delete from anyTable";
-        try (Statement stmt = Util.settingConnection().createStatement()) {
+        Connection connection = Util.getConnection();
+        String delete = "TRUNCATE TABLE users";
+        try (Statement stmt = connection.createStatement()) {
             stmt.execute(delete);
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException throwables) {
+                System.out.println("При попытке роллбэка произошла ошибка");
+                throwables.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
