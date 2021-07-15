@@ -20,7 +20,7 @@ public class UserDaoHibernateImpl implements UserDao {
                 + "id BIGINT NOT NULL AUTO_INCREMENT,"
                 + "name VARCHAR(45) NOT NULL,"
                 + "lastName VARCHAR(45) NOT NULL,"
-                + "age INT(3) NOT NULL, PRIMARY KEY (id))";
+                + "age TINYINT(3) NOT NULL, PRIMARY KEY (id))";
         try (SessionFactory sf = Util.getSessionFactory();
              Session session = sf.openSession()) {
             session.beginTransaction();

@@ -18,7 +18,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 + "id BIGINT NOT NULL AUTO_INCREMENT,"
                 + "name VARCHAR(45) NOT NULL,"
                 + "lastName VARCHAR(45) NOT NULL,"
-                + "age INT(3) NOT NULL, PRIMARY KEY (id))";
+                + "age TINYINT NOT NULL, PRIMARY KEY (id))";
         try (Statement stmt = connection.createStatement()) {
             stmt.executeUpdate(table);
             connection.commit();
@@ -72,9 +72,10 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void removeUserById(long id) {
         Connection connection = Util.getConnection();
-        String delete = "delete from users where id == id VALUES (?)";
+        String delete = "delete from users where id = (?)";
         try (PreparedStatement preStmt = connection.prepareStatement(delete)) {
             preStmt.setLong(1, id);
+            preStmt.execute();
             connection.commit();
         } catch (SQLException e) {
             try {
