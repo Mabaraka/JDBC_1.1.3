@@ -8,12 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
+    private Connection connection = Util.getConnection();
     public UserDaoJDBCImpl() {
 
     }
-
     public void createUsersTable() {
-        Connection connection = Util.getConnection();
         String table = "CREATE TABLE IF NOT EXISTS users ("
                 + "id BIGINT NOT NULL AUTO_INCREMENT,"
                 + "name VARCHAR(45) NOT NULL,"
@@ -34,7 +33,6 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void dropUsersTable() {
-        Connection connection = Util.getConnection();
         try (Statement stmt = connection.createStatement()) {
             stmt.execute("DROP TABLE IF EXISTS users;");
             connection.commit();
@@ -50,7 +48,6 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        Connection connection = Util.getConnection();
         String parameter = "INSERT INTO users (name, lastName, age) VALUES(?,?,?)";
         try (PreparedStatement preStmt = connection.prepareStatement(parameter)) {
             preStmt.setString(1, name);
@@ -71,7 +68,6 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
-        Connection connection = Util.getConnection();
         String delete = "delete from users where id = (?)";
         try (PreparedStatement preStmt = connection.prepareStatement(delete)) {
             preStmt.setLong(1, id);
@@ -89,7 +85,6 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public List<User> getAllUsers() {
-        Connection connection = Util.getConnection();
         List<User> result = new ArrayList<>();
         String query = "select * from users";
         try (Statement stmt = connection.createStatement()) {
@@ -115,7 +110,6 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        Connection connection = Util.getConnection();
         String delete = "TRUNCATE TABLE users";
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(delete);
