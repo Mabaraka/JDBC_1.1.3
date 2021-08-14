@@ -5,15 +5,17 @@ import jm.task.core.jdbc.model.User;
 import java.util.List;
 
 public interface UserService {
-    void createUsersTable();
 
-    void dropUsersTable();
+    void createTable();
 
-    void saveUser(String name, String lastName, byte age);
+    void dropTable();
 
-    void removeUserById(long id);
+    void cleanTable();
 
-    List<User> getAllUsers();
+    void save(String name, String lastName, byte age);
 
-    void cleanUsersTable();
+    void delete(long id);
+
+    List<User> getAll();
+
 }
